@@ -8,11 +8,11 @@
  */
 int print_int(va_list args)
 {
-	int n = va_arg(args, int);
-	int num = n;
+	long int n = va_arg(args, int);
+	long int num = n;
 	int digit, count = 0;
 	char c;
-	int divisor = 1; /* <-- هنا مكانه الصحيح */
+	long int divisor = 1;
 
 	if (n == 0)
 	{
