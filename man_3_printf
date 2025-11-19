@@ -1,0 +1,34 @@
+.TH _PRINTF 3 "Holberton School" "Custom printf"
+.SH NAME
+_printf \- custom implementation of printf
+.SH SYNOPSIS
+.B #include "main.h"
+.br
+.BI "int _printf(const char *" format ", ...);"
+.SH DESCRIPTION
+The _printf function produces output according to a format string.
+
+For this version (Task 0), the following conversion specifiers are supported:
+.TP
+.B %c
+Prints a single character.
+.TP
+.B %s
+Prints a string.
+.TP
+.B %%
+Prints a percent sign.
+
+Any other character following a percent sign is printed as a literal percent
+character followed by that character.
+
+.SH RETURN VALUE
+The _printf function returns the number of characters printed.
+
+If the format string is NULL, or if it ends with a single '%' character,
+the function returns -1.
+
+.SH AUTHOR:
+Hamsa Alammar and Abdulrahman Alqadhibi.
+Holberton School students.
+
