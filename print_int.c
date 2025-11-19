@@ -10,9 +10,9 @@ int print_int(va_list args)
 {
 	int n = va_arg(args, int);
 	int num = n;
-	int digit;
-	int count = 0;
+	int digit, count = 0;
 	char c;
+	int divisor = 1; /* <-- هنا مكانه الصحيح */
 
 	if (n == 0)
 	{
@@ -28,8 +28,7 @@ int print_int(va_list args)
 		num = -num;
 	}
 
-	/* Compute highest divisor */
-	int divisor = 1;
+	/* Find highest divisor */
 	while ((num / divisor) > 9)
 		divisor *= 10;
 
