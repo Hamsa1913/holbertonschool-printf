@@ -1,7 +1,7 @@
-Custom printf  Project Overview
+Custom printf- Project Overview
 
 This project focuses on creating a simplified custom implementation of the C standard library function printf.
-The main objective is to understand how formatted output works internally how the format string is parsed, how variadic arguments are processed, and how each specifier is handled manually using low-level system calls.
+The main objective is to understand how formatted output works internally - how the format string is parsed, how variadic arguments are processed, and how each specifier is handled manually using low-level system calls.
 
 Our _printf currently supports the following conversion specifiers:
 
@@ -11,23 +11,23 @@ Our _printf currently supports the following conversion specifiers:
 
 %% - prints a literal percent sign
 
-(Additional specifiers such as %d / %i for signed integers can be added later in future tasks.)
+%d - prints a signed integer
+
+%i - prints a signed integer
 
 The function loops through each character in the format string, checks if it encounters a %, and then calls the correct helper function depending on the specifier detected.
-No buffers and no global variables are used - only the write() system call and C variadic macros.
+No buffers and no global variables are used -  only the write() system call and standard C variadic macros.
 
 Authors:
 
-Hamsa Alammar
-
-Abdulrahman Alqadhibi
+Hamsa Alammar & Abdulrahman Alqadhibi
 
 Project Files Overview
-1 - main.h
+1 -main.h
 
-This header file contains:
+The header file that contains:
 
-All required function prototypes:
+Function prototypes:
 
 _printf
 
@@ -37,25 +37,28 @@ print_string
 
 print_percent
 
-All needed includes (<stdarg.h>, <unistd.h>)
+print_int
 
-Include guards to prevent double inclusion
+Required libraries (stdarg.h, unistd.h)
 
-This file links all .c files together and ensures modular compilation.
+Include guards
+
+This file links all .c files together.
 
 2 - _printf.c
 
 This is the core engine of the project.
+It handles:
 
-It is responsible for:
+Reading and parsing the format string
 
-Reading the format string character by character
+Detecting conversion specifiers
 
-Detecting when a format specifier starts (%)
+Calling the appropriate helper function (%c, %s, %i, %d, %%)
 
-Calling the correct helper function based on the specifier
+Tracking and returning the total printed characters
 
-Using variadic macros:
+It uses:
 
 va_list
 
@@ -65,72 +68,76 @@ va_arg
 
 va_end
 
-Returning the total count of printed characters
-
-The file contains only the main _printf function, keeping the project clean and respecting the limit of no more than 5 functions per file.
-
 3 - functions.c
 
-This file contains the helper functions that handle each supported specifier:
+Contains the helper functions for:
 
-print_char - handles %c
+%c - print_char
 
-print_string - handles %s
+%s - print_string
 
-print_percent - handles %%
+%% - print_percent
 
-Each helper is focused on a single task, which keeps the code modular and aligned with project structure guidelines.
+Each helper is responsible for printing one type only, which keeps the code modular.
 
-4- man_3_printf
+4 - print_int.c
 
-This manual page describes:
+This file contains the integer-printing logic for %d and %i.
+It handles:
+
+Positive integers
+
+Negative integers
+
+Printing digit by digit
+
+Counting characters printed
+
+5 - man_3_printf
+
+A manual page that explains:
 
 What _printf does
 
-The supported format specifiers
+Supported format specifiers
 
-The function prototype
+Return value
 
-How to use it
+Usage instructions
 
-The return value behavior
+Mimics the style of the official printf(3) man page.
 
-It mimics the style of the official printf(3) manual page.
-
-5- README.md
+6- README.md
 
 This documentation file (the one you are reading) explains:
 
-The purpose of the entire project
+The purpose of the project
 
-How _printf works internally
+The file structure
 
-What files exist and what each one does
+How _printf works
 
-Compilation instructions
+Supported specifiers
 
-Usage examples 
+Compilation
 
+Usage examples
 Summary
 
 This project teaches:
 
-How variadic functions work (va_list, va_start, va_arg, va_end)
+Variadic functions
 
-How to manually implement formatted output
+Manual formatted output
 
-How to design modular C programs using multiple files
+Integer-to-string logic
 
-How to respect system-level constraints:
+Modular C design
 
-No global variables
+Working with strict coding rules (Betty, no globals, no more than 5 funcs/file)
 
-No more than 5 functions per file
+Designing documentation (man and README)
 
-Manual man page
+Git workflow in team projects
 
-Strict Betty coding style
-
-How to collaborate within a shared GitHub repository and maintain clean commit history
-
-It is a foundational project for understanding low-level programming, system design, and how the real printf function behaves internally.
+It is a foundational low-level programming project that builds understanding for how real system functions like printf work internally.
