@@ -31,25 +31,20 @@ Prints a signed integer in base 10.
 .B %i
 Prints a signed integer in base 10.
 
-If an unsupported conversion specifier is encountered, _printf prints
-the percent sign and the following character as-is.
+Unsupported specifiers are printed as a percent sign followed by the character.
 
-The function does not use any global variables and prints all output
-directly using the write() system call.
+The function uses only the write() system call and standard variadic macros.
+No global variables are used.
 
 .SH RETURN VALUE
-The _printf function returns the total number of characters printed.
-If the format string is NULL, or ends with a single '%' character,
-the function returns -1.
+_printf returns the total number of characters printed.
+If the input format is NULL or ends with a lone percent sign, it returns -1.
 
 .SH EXAMPLES
-The following examples illustrate typical usage:
-
 .nf
-_printf("Character: %c\n", 'H');
+_printf("Number: %d\n", 98);
 _printf("String: %s\n", "Holberton");
 _printf("Percent: %%\n");
-_printf("Number: %d\n", 98);
 _printf("Integer: %i\n", -402);
 .fi
 
