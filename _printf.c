@@ -1,6 +1,7 @@
 #include "main.h"
 #include <stdarg.h>
 #include <unistd.h>
+#include <limits.h>
 
 /**
  * print_binary - converts unsigned int to binary
@@ -29,6 +30,17 @@ int print_binary(unsigned int num)
 }
 
 /**
+ * handle_binary - handles %b specifier for different types
+ * @args: arguments list
+ * Return: number of characters printed
+ */
+int handle_binary(va_list args)
+{
+	unsigned int num = va_arg(args, unsigned int);
+	return (print_binary(num));
+}
+
+/**
  * _printf - produces output according to a format
  * @format: format string containing conversion specifiers
  * Return: number of characters printed
@@ -38,10 +50,10 @@ int _printf(const char *format, ...)
 	va_list args;
 	int i = 0, count = 0;
 
-	va_start(args, format);
-
 	if (!format)
 		return (-1);
+
+	va_start(args, format);
 
 	while (format[i])
 	{
@@ -52,7 +64,7 @@ int _printf(const char *format, ...)
 				return (-1);
 
 			if (format[i] == 'b')
-				count += print_binary(va_arg(args, unsigned int));
+				count += handle_binary(args);
 			else if (format[i] == '%')
 				count += write(1, "%", 1);
 			else
@@ -69,4 +81,3 @@ int _printf(const char *format, ...)
 	va_end(args);
 	return (count);
 }
-
