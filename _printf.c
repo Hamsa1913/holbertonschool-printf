@@ -1,84 +1,193 @@
 #include "main.h"
 #include <stdarg.h>
-#include <unistd.h>
-#include <limits.h>
+#include <ctype.h>
 
-/**
- * print_binary - converts unsigned int to binary
- * @num: number to convert to binary
- * Return: number of characters printed
- */
-int print_binary(unsigned int num)
+static void init_opts(fmt_options *o)
 {
-	char binary[32];
-	int i = 0, len = 0;
-
-	if (num == 0)
-		return (write(1, "0", 1));
-
-	while (num > 0)
-	{
-		binary[i++] = (num % 2) + '0';
-		num /= 2;
-	}
-
-	len = i;
-	while (i > 0)
-		write(1, &binary[--i], 1);
-
-	return (len);
+    o->plus = o->space = o->hash = o->zero = o->dash = 0;
+    o->width = 0;
+    o->precision = 0;
+    o->precision_specified = 0;
+    o->length = 0;
 }
 
-/**
- * handle_binary - handles %b specifier for different types
- * @args: arguments list
- * Return: number of characters printed
- */
-int handle_binary(va_list args)
-{
-	unsigned int num = va_arg(args, unsigned int);
-
-	return (print_binary(num));
-}
-
-/**
- * _printf - produces output according to a format
- * @format: format string containing conversion specifiers
- * Return: number of characters printed
- */
 int _printf(const char *format, ...)
 {
-	va_list args;
-	int i = 0, count = 0;
+    va_list args;
+    int count = 0;
+    fmt_options opts;
 
-	if (!format)
-		return (-1);
+    if (!format)
+        return (-1);
 
-	va_start(args, format);
+    va_start(args, format);
 
-	while (format[i])
-	{
-		if (format[i] == '%')
-		{
-			i++;
-			if (!format[i])
-				return (-1);
+    while (*format)
+    {
+        if (*format == '%')
+        {
+            format++;
+            init_opts(&opts);
 
-			if (format[i] == 'b')
-				count += handle_binary(args);
-			else if (format[i] == '%')
-				count += write(1, "%", 1);
-			else
-			{
-				count += write(1, "%", 1);
-				count += write(1, &format[i], 1);
-			}
-			i++;
-		}
-		else
-			count += write(1, &format[i++], 1);
-	}
+            /* parse flags */
+            while (*format == '+' || *format == ' ' || *format == '#' ||
+                   *format == '0' || *format == '-')
+            {
+                if (*format == '+')
+                    opts.plus = 1;
+                else if (*format == ' ')
+                    opts.space = 1;
+                else if (*format == '#')
+                    opts.hash = 1;
+                else if (*format == '0')
+                    opts.zero = 1;
+                else if (*format == '-')
+                {
+                    opts.dash = 1;
+                    /* '-' overrides '0' */
+                    opts.zero = 0;
+                }
+                format++;
+            }
 
-	va_end(args);
-	return (count);
+            /* parse width (number or *) */
+            if (*format == '*')
+            {
+                int w = va_arg(args, int);
+                if (w < 0)
+                {
+                    opts.dash = 1;
+                    opts.width = -w;
+                }
+                else
+                {
+                    opts.width = w;
+                }
+                format++;
+            }
+            else if (isdigit((unsigned char)*format))
+            {
+                opts.width = 0;
+                while (isdigit((unsigned char)*format))
+                {
+                    opts.width = opts.width * 10 + (*format - '0');
+                    format++;
+                }
+            }
+
+            /* parse precision ('.' followed by number or '*') */
+            if (*format == '.')
+            {
+                format++;
+                opts.precision_specified = 1;
+                if (*format == '*')
+                {
+                    int p = va_arg(args, int);
+                    if (p >= 0)
+                    {
+                        opts.precision = p;
+                    }
+                    else
+                    {
+                        /* negative precision means it's ignored */
+                        opts.precision_specified = 0;
+                        opts.precision = 0;
+                    }
+                    format++;
+                }
+                else
+                {
+                    opts.precision = 0;
+                    while (isdigit((unsigned char)*format))
+                    {
+                        opts.precision = opts.precision * 10 + (*format - '0');
+                        format++;
+                    }
+                }
+            }
+
+            /* parse length */
+            if (*format == 'h' || *format == 'l')
+            {
+                opts.length = *format;
+                format++;
+            }
+
+            if (*format == '\0')
+            {
+                va_end(args);
+                return (-1);
+            }
+
+            switch (*format)
+            {
+            case 'c':
+                count += print_char(args, &opts);
+                break;
+
+            case 's':
+                count += print_string(args, &opts);
+                break;
+
+            case '%':
+                count += print_percent(args, &opts);
+                break;
+
+            case 'r': /* custom: reversed string */
+                count += print_reverse(args, &opts);
+                break;
+
+            case 'R': /* custom: ROT13 string */
+                count += print_rot13(args, &opts);
+                break;
+
+            case 'S': /* custom: non-printable as \xHH */
+                count += print_S(args, &opts);
+                break;
+
+            case 'd':
+            case 'i':
+                count += print_number(args, &opts);
+                break;
+
+            case 'u':
+                count += print_unsigned(args, &opts, 10, 0);
+                break;
+
+            case 'o':
+                count += print_unsigned(args, &opts, 8, 0);
+                break;
+
+            case 'x':
+                count += print_unsigned(args, &opts, 16, 0);
+                break;
+
+            case 'X':
+                count += print_unsigned(args, &opts, 16, 1);
+                break;
+
+            case 'p': /* pointer */
+                count += print_pointer(args, &opts);
+                break;
+
+            case 'b': /* custom: binary */
+                count += print_unsigned(args, &opts, 2, 0);
+                break;
+
+            default:
+                count += _putchar('%');
+                count += _putchar(*format);
+                break;
+            }
+        }
+        else
+        {
+            count += _putchar(*format);
+        }
+
+        format++;
+    }
+
+    va_end(args);
+    return count;
 }
