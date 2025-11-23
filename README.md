@@ -20,7 +20,7 @@ No buffers and no global variables are used -  only the write() system call and 
 
 Authors:
 
-Hamsa Alammar & Abdulrahman Alqadhibi
+Hamsa Alammar
 
 Project Files Overview
 1 -main.h
